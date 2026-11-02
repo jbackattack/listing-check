@@ -61,3 +61,42 @@ This version has no Slack alert and makes no fixes. The plan:
 4. **Widen slowly,** only after weeks of accurate suggestions.
 
 **Which way fixes go:** the MLS entry made by the listing agent is the source of truth. The agent corrects the site copies to match it. It does not edit the MLS record. If the MLS entry looks wrong, it alerts the listing agent or data owner. Any write access needs Legal and MLS approval first.
+
+## Next steps: connecting real data
+This project only works on made-up data today. These steps are the order I would take to point it at real listings. Each step is small enough to test on its own.
+
+**0. Get permission first.** MLS data comes with licensing and use terms. Confirm with Legal and the MLS what you may read, store and show before connecting anything. Keep real listing data, keys and passwords out of this repository. Use environment variables for credentials and add any real data folders to `.gitignore`.
+
+**1. Read the MLS record through a source adapter.** Write one small module that fetches MLS records and returns them in the same shape the validator already uses (`listing_id`, `status`, `list_price`, `address`, `beds`, `baths`, `sqft`, `remarks`, `last_modified`, `hide_address`, `syndicate_to`). The validator stays unchanged. Many MLSs offer the RESO Web API, which returns JSON over HTTPS with an access token and supports filtered queries. RESO's Data Dictionary gives standard field names, so the adapter is mostly a mapping table. Examples:
+
+| This project | RESO field (check the MLS's own docs) |
+|---|---|
+| `status` | `StandardStatus` |
+| `list_price` | `ListPrice` |
+| `address` | `UnparsedAddress` |
+| `beds` | `BedroomsTotal` |
+| `baths` | `BathroomsTotalInteger` |
+| `sqft` | `LivingArea` |
+| `remarks` | `PublicRemarks` |
+| `last_modified` | `ModificationTimestamp` |
+| `hide_address` | `InternetAddressDisplayYN` (inverted) |
+
+Field names and status values vary by MLS, so confirm each one against that MLS's documentation.
+
+**2. Read what each site shows through a site adapter.** One adapter per site, each returning the same shape as `site_displays.json`. Use the site's API if it has one. If not, read the public page, following the site's terms and rate limits. Start with one site.
+
+**3. Move the rules into config.** Put each MLS's field mapping, status words, required fields and rules in a config file, not in code, so adding an MLS means adding a file.
+
+**4. Start small and read-only.** One MLS, a handful of listings, one site. Check every finding by hand. Count false alarms and missed problems, then fix the rules.
+
+**5. Run it beside the manual process.** Compare its results to the manual checks for a few weeks and keep a baseline: time spent, problems found, problems missed.
+
+**6. Make an empty result an alert, not a pass.** If the feed returns nothing, times out or returns an error, the run should report "no data" and alert. A broken feed must never look like "all clear."
+
+**7. Schedule it.** Check listings that changed since the last run (using the modification time), plus a full sweep each night. Run it on an internal scheduler or workflow tool, not a public CI log, so real listing data never ends up in public logs.
+
+**8. Add alerts.** Post critical findings to Slack (or similar) with the listing, site, field, what the MLS says, what the site shows, and a suggested next step. Batch medium and low findings into a daily summary. Keep webhook addresses in environment variables.
+
+**9. Protect seller data.** Keep the audit log free of seller personal details, set how long logs are kept, and handle hidden-address listings with extra care in reports and alerts.
+
+**10. Measure, then consider fixes.** Track alerts per day, false alarm rate, time to detect, time to fix and hours returned. Only then consider the suggest-then-approve fix flow from the roadmap above. Fixes always go to the site copies. The MLS record is never edited.
