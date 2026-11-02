@@ -1,6 +1,6 @@
 # Listing validation prototype
 
-When a listing moves from an agent to the MLS and out to other sites, details can change or go missing along the way. This prototype shows one way to catch that automatically. It treats the MLS entry as the source of truth, compares what each site shows, ranks the differences by business impact, and sends them to a person to review.
+When a listing moves from the listing agent to the MLS and out to other sites, details can change or go missing along the way. This prototype shows one way to catch that automatically. It treats the MLS entry as the source of truth, compares what each site shows, ranks the differences by business impact, and sends them to a person to review.
 
 ![The Listing Check demo showing a price mismatch on one portal](docs/screenshot.png)
 
@@ -60,11 +60,21 @@ Exact fields like price and status are checked with rules, so the result is the 
 ## Roadmap: alerts and self-healing (plan, not built)
 This version has no Slack alert and makes no fixes. The plan:
 1. **Alert.** Critical findings post to Slack (or a similar place) right away with the listing, site, field, what the MLS says, what the site shows, and a suggested next step. High findings post the same day. Medium and low go in a daily summary. A sync-delay recheck stays quiet unless it still fails.
-2. **Suggest a fix.** The agent proposes the exact correction and a person approves it.
+2. **Suggest a fix.** The tool proposes the exact correction and a person approves it.
 3. **Auto-fix low risk.** Only a short approved list, such as re-sending the MLS data to a site, with a re-check after every fix, a rollback, a kill switch and an audit trail.
 4. **Widen slowly,** only after weeks of accurate suggestions.
 
-**Which way fixes go:** the MLS entry made by the listing agent is the source of truth. The agent corrects the site copies to match it. It does not edit the MLS record. If the MLS entry looks wrong, it alerts the listing agent or data owner. Any write access needs Legal and MLS approval first.
+**Which way fixes go:** the MLS entry made by the listing agent is the source of truth. The tool corrects the site copies to match it. It does not edit the MLS record. If the MLS entry looks wrong, it alerts the listing agent or data owner. Any write access needs Legal and MLS approval first.
+
+## Toward an agentic workflow (idea, not built)
+Today this is a rules-based validation workflow. It is not an agent, because no AI model decides what to do next. These are the steps I would take to grow it into one, in order. Exact fields such as price and status would stay rule-based so the results remain auditable.
+
+1. **Add an AI step for the judgment calls.** Compare description text to the MLS remarks and explain a mismatch in plain language. Build a small labeled test set first (pairs with known answers) and measure accuracy before relying on it.
+2. **Let it investigate, read-only.** Give it tools to fetch the MLS record, fetch a site page, and read earlier runs. Before alerting, it gathers evidence: is the difference still there, does it affect other listings or sites, did it start after a particular change. It reports a root-cause guess, for example "Portal B looks like it is serving a cached copy."
+3. **Let it propose actions.** It drafts the alert and the suggested fix and names which tool would apply it. A person approves.
+4. **Give it memory.** Keep past findings and the ones marked "not an issue," so it triages better over time.
+5. **Add guardrails before any write access.** A list of allowed tools, a step limit, a log of every tool call, tests on labeled cases, human approval for any change, and a kill switch.
+6. **Only then allow limited actions,** starting with the low-risk fixes in the roadmap above.
 
 ## When it runs (plan, not built)
 
