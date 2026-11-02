@@ -67,6 +67,36 @@ This version has no Slack alert and makes no fixes. The plan:
 **Which way fixes go:** the MLS entry made by the listing agent is the source of truth. The agent corrects the site copies to match it. It does not edit the MLS record. If the MLS entry looks wrong, it alerts the listing agent or data owner. Any write access needs Legal and MLS approval first.
 
 ## When it runs (plan, not built)
+
+```mermaid
+flowchart TD
+    A["Every 15 minutes<br/>changed listings plus open rechecks"] --> C
+    B["Nightly<br/>full sweep, riskiest first"] --> C
+    C["Read MLS records"] --> D{"Feed returned data?"}
+    D -- "No" --> E["One 'no data' alert<br/>never counts as a pass"]
+    D -- "Yes" --> F["Read what each site shows"]
+    F --> G["Clean up formats and<br/>compare field by field"]
+    G --> H{"Difference found?"}
+    H -- "No" --> I["Log as checked"]
+    H -- "Yes" --> J{"Already marked recheck<br/>on the last run?"}
+    J -- "No" --> K["Mark recheck and remember it"]
+    K -. "next run" .-> C
+    J -- "Yes, still there" --> L["Real finding,<br/>ranked by severity"]
+    L --> M{"Severity"}
+    M -- "Critical" --> N["Slack now, ping the owner"]
+    M -- "High" --> O["Slack the same day"]
+    M -- "Medium or low" --> P["Daily summary"]
+    N --> Q["A person reviews"]
+    O --> Q
+    P --> Q
+    Q --> R["Fix the site copy,<br/>never the MLS"]
+    R --> S["Run the check again to confirm"]
+    I --> T["Audit log"]
+    L --> T
+```
+
+The prototype covers the compare, rank and report steps. The schedule, the "recheck" memory between runs, Slack alerts and fixes are the plan.
+
 Two jobs, each with a different purpose.
 
 **Every 15 minutes: catch caching and sync problems.**
