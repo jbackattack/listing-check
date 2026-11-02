@@ -66,6 +66,22 @@ This version has no Slack alert and makes no fixes. The plan:
 
 **Which way fixes go:** the MLS entry made by the listing agent is the source of truth. The agent corrects the site copies to match it. It does not edit the MLS record. If the MLS entry looks wrong, it alerts the listing agent or data owner. Any write access needs Legal and MLS approval first.
 
+## When it runs (plan, not built)
+Two jobs, each with a different purpose.
+
+**Every 15 minutes: catch caching and sync problems.**
+- Check listings that changed recently, plus anything still marked "recheck" from the last run. Do not recheck the whole inventory.
+- A difference seen for the first time is marked "recheck" and remembered. If the next run still sees it, it becomes a real finding. This is how a cache problem that lasts shows up, without alerting on a normal short delay.
+- Check critical fields (price, status, hidden address) on every run. Lower-risk fields such as description text can be checked less often.
+- Skip a start if the previous run is still going, so runs never overlap.
+- If the feed is down or returns nothing, send one "no data" alert, not one alert per listing.
+
+**Nightly: the safety net.**
+- Compare every listing on every site. This catches drift the 15-minute job cannot see, such as a site edited by hand with no MLS change.
+- If the full set is too large for one night, sweep it in slices and start with the highest-risk listings.
+
+**Setting the real numbers.** Measure how long each site takes to reflect a change and use that per site. A site whose cache lasts 30 minutes may need two or three runs in a row to fail before alerting. Also check API limits and cost. The prototype uses one fixed 15-minute window for every site and does not yet remember "recheck" results between runs.
+
 ## Next steps: connecting real data
 This project only works on made-up data today. These steps are the order I would take to point it at real listings. Each step is small enough to test on its own.
 
