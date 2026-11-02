@@ -1,5 +1,9 @@
 # Listing validation prototype
 
+When a listing moves from an agent to the MLS and out to other sites, details can change or go missing along the way. This prototype shows one way to catch that automatically. It treats the MLS entry as the source of truth, compares what each site shows, ranks the differences by business impact, and sends them to a person to review.
+
+![The Listing Check demo showing a price mismatch on one portal](docs/screenshot.png)
+
 A small prototype that checks whether a listing shows the right information on each site, using the MLS record as the source of truth.
 
 **This is a prototype on made-up data.** The listings, addresses and site displays are invented. It does not use real MLS data and it is not a production system.
