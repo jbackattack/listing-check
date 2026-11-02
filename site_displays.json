@@ -1,0 +1,35 @@
+{
+  "_note": "MADE-UP data. What each site shows for each listing. A missing key means the listing is not shown on that site.",
+  "agent_platform": {
+    "L1001":{"status":"Active","list_price":"$725,000","address":"14 Maple Ln","beds":4,"baths":3,"sqft":2400,"remarks":"Sunny colonial with updated kitchen and fenced yard."},
+    "L1002":{"status":"Pending","list_price":"$512,000","address":"88 Harbor Rd","beds":3,"baths":2,"sqft":1650,"remarks":"Walk to the water. Contract signed."},
+    "L1003":{"status":"Active","list_price":"$1,250,000","address":"Address withheld","beds":5,"baths":4,"sqft":3900,"remarks":"Private lot. Showings by appointment."},
+    "L1004":{"status":"Active","list_price":"$389,000","address":"212 Elm St","beds":2,"baths":1,"sqft":1850,"remarks":"Bright corner unit near the train. Pets welcome. New roof in 2024."},
+    "L1005":{"status":"Active","list_price":"$589,000","address":"9 Birch Dr","beds":3,"baths":2,"sqft":1720,"remarks":"Price improvement."},
+    "L1006":{"status":"Active","list_price":"$445,000","address":"301 Cedar Ave","beds":3,"baths":2,"sqft":1500,"remarks":"Quiet street."},
+    "L1007":{"status":"Active","list_price":"$310,000","address":"77 Pine Ct","beds":3,"baths":2,"sqft":1300,"remarks":"Record with bad inputs."}
+  },
+  "brand_site": {
+    "L1001":{"status":"Active","list_price":"$725,000","address":"14 Maple Lane","beds":4,"baths":3,"sqft":2400,"remarks":"Sunny colonial with updated kitchen and fenced yard."},
+    "L1002":{"status":"For Sale","list_price":"$512,000","address":"88 Harbor Rd","beds":3,"baths":2,"sqft":1650,"remarks":"Walk to the water. Contract signed."},
+    "L1003":{"status":"Active","list_price":"$1,250,000","address":"Address withheld","beds":5,"baths":4,"sqft":3900,"remarks":"Private lot. Showings by appointment."},
+    "L1004":{"status":"Active","list_price":"$389,000","address":"212 Elm St","beds":2,"baths":1,"sqft":1850,"remarks":"Bright corner unit near the train. Pets welcome..."},
+    "L1005":{"status":"Active","list_price":"$589,000","address":"9 Birch Dr","beds":3,"baths":2,"sqft":1720,"remarks":"Price improvement."},
+    "L1007":{"status":"Active","list_price":"$310,000","address":"77 Pine Ct","beds":3,"baths":2,"sqft":1300,"remarks":"Record with bad inputs."}
+  },
+  "portal_a": {
+    "L1001":{"status":"Active","list_price":"725000","address":"14 Maple Ln","beds":4,"baths":3,"sqft":2400,"remarks":"Sunny colonial with updated kitchen and fenced yard."},
+    "L1002":{"status":"Under Contract","list_price":"$512,000","address":"88 Harbor Rd","beds":3,"baths":2,"sqft":1650,"remarks":"Walk to the water. Contract signed."},
+    "L1003":{"status":"Active","list_price":"$1,250,000","address":"5 Orchard Ct","beds":5,"baths":4,"sqft":3900,"remarks":"Private lot. Showings by appointment."},
+    "L1004":{"status":"Active","list_price":"$389,000","address":"212 Elm St","beds":2,"baths":1,"sqft":1580,"remarks":"Bright corner unit near the train. Pets welcome. New roof in 2024."},
+    "L1005":{"status":"Active","list_price":"$610,000","address":"9 Birch Dr","beds":3,"baths":2,"sqft":1720,"remarks":"Price improvement."},
+    "L1006":{"status":"Active","list_price":"$445,000","address":"301 Cedar Ave","beds":3,"baths":2,"sqft":1500,"remarks":"Quiet street."}
+  },
+  "portal_b": {
+    "L1001":{"status":"Active","list_price":"$752,000","address":"14 Maple Ln","beds":4,"baths":3,"sqft":2400,"remarks":"Sunny colonial with updated kitchen and fenced yard."},
+    "L1002":{"status":"Pending","list_price":"$512,000","address":"88 Harbor Rd","beds":3,"baths":2,"sqft":1650,"remarks":"Walk to the water. Contract signed."},
+    "L1004":{"status":"Active","list_price":"$389,000","address":"212 Elm St","beds":2,"baths":1,"sqft":1850,"remarks":"Bright corner unit near the train. Pets welcome. New roof in 2024."},
+    "L1005":{"status":"Active","list_price":"$610,000","address":"9 Birch Dr","beds":3,"baths":2,"sqft":1720,"remarks":"Price improvement."},
+    "L1006":{"status":"Active","list_price":"$445,000","address":"301 Cedar Ave","beds":3,"baths":2,"sqft":1500,"remarks":"Quiet street."}
+  }
+}

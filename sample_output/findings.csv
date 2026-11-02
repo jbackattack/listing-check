@@ -1,0 +1,12 @@
+severity,listing_id,site,field,kind,expected,shown,note,action
+critical,L1001,portal_b,list_price,mismatch,725000,"$752,000","portal_b shows '$752,000'; the MLS has 725000.",Fix now and tell the listing agent.
+critical,L1002,brand_site,status,mismatch,Pending,For Sale,brand_site shows 'For Sale'; the MLS has 'Pending'.,Fix now and tell the listing agent.
+critical,L1003,portal_a,address,instruction_violation,address hidden,5 Orchard Ct,"The seller asked to hide the address, but it is showing.",Fix now and tell the listing agent.
+critical,L1006,portal_b,syndication,instruction_violation,"only ['agent_platform', 'brand_site', 'portal_a']",shown,The seller's instructions do not allow portal_b to show this listing.,Fix now and tell the listing agent.
+high,L1006,brand_site,listing,missing_listing,shown,not shown,brand_site should show this listing but does not.,Review today.
+high,L1007,MLS,list_price,source_unreadable,N/A,,The MLS record itself has a problem: price not readable: 'N/A'. Not compared.,Review today.
+high,L1007,MLS,beds,source_unreadable,,,The MLS record itself has a problem: number missing. Not compared.,Review today.
+medium,L1004,portal_a,sqft,mismatch,1850,1580,portal_a shows 1580; the MLS has 1850.,Review this week.
+low,L1004,brand_site,remarks,truncated,Bright corner unit near the train. Pets welcome. New roof in 2024.,Bright corner unit near the train. Pets welcome...,Description is cut off.,Log it. Fix when convenient.
+recheck,L1005,portal_a,list_price,possible_sync_lag,589000,"$610,000","The MLS changed in the last 15 minutes, so portal_a may not have synced yet.",Probably a sync delay. Check again after the sync window.
+recheck,L1005,portal_b,list_price,possible_sync_lag,589000,"$610,000","The MLS changed in the last 15 minutes, so portal_b may not have synced yet.",Probably a sync delay. Check again after the sync window.

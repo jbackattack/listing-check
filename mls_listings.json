@@ -1,0 +1,12 @@
+{
+  "_note": "MADE-UP data for a prototype. Not real listings. Not MLS data.",
+  "listings": [
+    {"listing_id":"L1001","status":"Active","list_price":725000,"address":"14 Maple Ln","beds":4,"baths":3,"sqft":2400,"remarks":"Sunny colonial with updated kitchen and fenced yard.","last_modified":"2026-11-01T09:00:00Z","hide_address":false,"syndicate_to":["agent_platform","brand_site","portal_a","portal_b"]},
+    {"listing_id":"L1002","status":"Pending","list_price":512000,"address":"88 Harbor Rd","beds":3,"baths":2,"sqft":1650,"remarks":"Walk to the water. Contract signed.","last_modified":"2026-11-02T12:00:00Z","hide_address":false,"syndicate_to":["agent_platform","brand_site","portal_a","portal_b"]},
+    {"listing_id":"L1003","status":"Active","list_price":1250000,"address":"5 Orchard Ct","beds":5,"baths":4,"sqft":3900,"remarks":"Private lot. Showings by appointment.","last_modified":"2026-11-01T10:30:00Z","hide_address":true,"syndicate_to":["agent_platform","brand_site","portal_a"]},
+    {"listing_id":"L1004","status":"Active","list_price":389000,"address":"212 Elm Street","beds":2,"baths":1,"sqft":1850,"remarks":"Bright corner unit near the train. Pets welcome. New roof in 2024.","last_modified":"2026-11-01T08:15:00Z","hide_address":false,"syndicate_to":["agent_platform","brand_site","portal_a","portal_b"]},
+    {"listing_id":"L1005","status":"Active","list_price":589000,"address":"9 Birch Drive","beds":3,"baths":2,"sqft":1720,"remarks":"Price improvement.","last_modified":"2026-11-02T13:52:00Z","hide_address":false,"syndicate_to":["agent_platform","brand_site","portal_a","portal_b"]},
+    {"listing_id":"L1006","status":"Active","list_price":445000,"address":"301 Cedar Avenue","beds":3,"baths":2,"sqft":1500,"remarks":"Quiet street.","last_modified":"2026-11-01T11:00:00Z","hide_address":false,"syndicate_to":["agent_platform","brand_site","portal_a"]},
+    {"listing_id":"L1007","status":"Active","list_price":"N/A","address":"77 Pine Ct","beds":null,"baths":2,"sqft":1300,"remarks":"Record with bad inputs.","last_modified":"2026-11-01T07:00:00Z","hide_address":false,"syndicate_to":["agent_platform","brand_site"]}
+  ]
+}

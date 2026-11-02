@@ -1,0 +1,456 @@
+<title>Listing Check</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: listing picker on the left, a field-by-site comparison grid in the middle of the work, findings under it. Summary counts sit on top. */
+:root{
+  --bg:#F2F6F6; --surface:#FFFFFF; --surface-2:#EAF0F0; --ink:#14222A; --muted:#566A72; --line:#D5DFE1;
+  --accent:#0B6E73; --accent-ink:#FFFFFF; --focus:#0B6E73;
+  --crit:#B3261E; --crit-bg:#FBE9E7; --high:#A85A00; --high-bg:#FDF0DC; --med:#7C6400; --med-bg:#F8F1CF;
+  --low:#4B606B; --low-bg:#E7EEF1; --recheck:#2C5FA8; --recheck-bg:#E4EDF9; --ok:#1E7B4B; --ok-bg:#E3F3EA;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-data:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1618; --surface:#142124; --surface-2:#1B2D31; --ink:#E5EEF0; --muted:#90A5AC; --line:#26383D;
+    --accent:#4FC3C8; --accent-ink:#06191B; --focus:#4FC3C8;
+    --crit:#FF8A7D; --crit-bg:#3A1E1B; --high:#F3A552; --high-bg:#3A2A14; --med:#E3C85A; --med-bg:#363014;
+    --low:#A3B8C1; --low-bg:#22313A; --recheck:#86B2F2; --recheck-bg:#1C2D47; --ok:#6CD39D; --ok-bg:#16301F;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1618; --surface:#142124; --surface-2:#1B2D31; --ink:#E5EEF0; --muted:#90A5AC; --line:#26383D;
+  --accent:#4FC3C8; --accent-ink:#06191B; --focus:#4FC3C8;
+  --crit:#FF8A7D; --crit-bg:#3A1E1B; --high:#F3A552; --high-bg:#3A2A14; --med:#E3C85A; --med-bg:#363014;
+  --low:#A3B8C1; --low-bg:#22313A; --recheck:#86B2F2; --recheck-bg:#1C2D47; --ok:#6CD39D; --ok-bg:#16301F;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:14px;line-height:1.5;
+  padding-block:24px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1{font-size:26px;line-height:1.15;font-weight:600;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:15px;font-weight:600;margin:0}
+p{margin:0}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.top{display:flex;flex-direction:column;gap:10px}
+.sub{color:var(--muted);max-width:68ch}
+.notice{display:flex;gap:10px;align-items:flex-start;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:10px 12px;max-width:80ch}
+.notice strong{font-weight:600}
+.summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;border-top:3px solid var(--c)}
+.stat .n{font-family:var(--font-data);font-size:24px;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.s-critical{--c:var(--crit)}.s-high{--c:var(--high)}.s-medium{--c:var(--med)}.s-low{--c:var(--low)}.s-recheck{--c:var(--recheck)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.tabs{display:flex;gap:4px;background:var(--surface-2);padding:3px;border-radius:8px;border:1px solid var(--line)}
+.tab{border:0;background:transparent;padding:6px 14px;border-radius:6px;cursor:pointer;color:var(--muted);font-weight:500}
+.tab[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.ctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:6px 12px;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.clock{font-family:var(--font-data);font-size:12px;color:var(--muted)}
+.layout{display:grid;grid-template-columns:260px minmax(0,1fr);gap:16px;align-items:start}
+.list{display:flex;flex-direction:column;gap:6px}
+.item{display:flex;flex-direction:column;gap:2px;text-align:left;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--c,var(--ok));border-radius:8px;padding:8px 10px;cursor:pointer}
+.item[aria-current="true"]{border-color:var(--accent);border-left-color:var(--c,var(--ok));box-shadow:0 0 0 1px var(--accent)}
+.item .id{font-family:var(--font-data);font-size:12px;color:var(--muted)}
+.item .ad{font-weight:500}
+.item .cnt{font-size:12px;color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.mls{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-items:start}
+.mls .box{display:flex;flex-direction:column;gap:6px}
+.lab{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--surface-2);font-size:13px}
+.num{width:88px;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:4px 8px;font-family:var(--font-data)}
+.gridwrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table.grid{border-collapse:collapse;width:100%;min-width:760px}
+.grid th,.grid td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:middle}
+.grid tr:last-child th,.grid tr:last-child td{border-bottom:0}
+.grid thead th{background:var(--surface-2);font-weight:600;font-size:13px;vertical-align:top}
+.grid tbody th{font-weight:500;color:var(--muted);white-space:nowrap}
+.src{font-family:var(--font-data);font-size:13px;background:var(--surface-2);min-width:130px;max-width:220px;overflow-wrap:anywhere}
+.sitehead{display:flex;flex-direction:column;gap:3px}
+.shown{display:flex;align-items:center;gap:6px;font-weight:400;font-size:12px;color:var(--muted)}
+.sitebadge{font-size:11px;font-weight:600;color:var(--c);text-transform:uppercase;letter-spacing:.05em}
+.cell{width:100%;min-width:120px;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:5px 8px;font-family:var(--font-data);font-size:13px;border-left:4px solid var(--line)}
+.cell:disabled{background:var(--surface-2);color:var(--muted);border-style:dashed}
+.cell.f-critical{border-left-color:var(--crit);background:var(--crit-bg)}
+.cell.f-high{border-left-color:var(--high);background:var(--high-bg)}
+.cell.f-medium{border-left-color:var(--med);background:var(--med-bg)}
+.cell.f-low{border-left-color:var(--low);background:var(--low-bg)}
+.cell.f-recheck{border-left-color:var(--recheck);background:var(--recheck-bg)}
+.cell.ok{border-left-color:var(--ok)}
+.finding{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:start;border:1px solid var(--line);border-left:4px solid var(--c);border-radius:8px;padding:10px 12px}
+.finding p.next{color:var(--muted);font-size:13px}
+.badge{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--c);background:var(--bg-c);border-radius:4px;padding:2px 8px;white-space:nowrap}
+.sev-critical{--c:var(--crit);--bg-c:var(--crit-bg)}.sev-high{--c:var(--high);--bg-c:var(--high-bg)}
+.sev-medium{--c:var(--med);--bg-c:var(--med-bg)}.sev-low{--c:var(--low);--bg-c:var(--low-bg)}.sev-recheck{--c:var(--recheck);--bg-c:var(--recheck-bg)}
+.good{display:flex;gap:8px;align-items:center;background:var(--ok-bg);color:var(--ok);border-radius:8px;padding:10px 12px;font-weight:500}
+.finds{display:flex;flex-direction:column;gap:8px}
+.tablewrap{overflow-x:auto}
+table.rep{border-collapse:collapse;width:100%;min-width:720px}
+.rep th,.rep td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
+.rep th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.mono{font-family:var(--font-data);font-size:12px}
+pre.audit{margin:8px 0 0;max-height:240px;overflow:auto;background:var(--surface-2);border-radius:8px;padding:10px;font-family:var(--font-data);font-size:12px}
+details summary{cursor:pointer;font-weight:500}
+details ul{margin:8px 0 0;padding-left:20px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.try{color:var(--muted);font-size:13px}
+@media (max-width:860px){
+  .summary{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .list{flex-direction:row;overflow-x:auto;padding-bottom:4px}
+  .item{min-width:170px}
+  .finding{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:420px){ .summary{grid-template-columns:repeat(2,minmax(0,1fr))} h1{font-size:22px} }
+@media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important} }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Listing Check</h1>
+    <p class="sub">Compares what a seller put in the MLS with what each site shows. Change a value in the grid and the check runs again.</p>
+    <div class="notice"><span aria-hidden="true">&#9432;</span><p><strong>Prototype on made-up listings.</strong> No real MLS data. Exact fields are checked with plain rules, no AI model. It only flags problems. A person decides what to fix.</p></div>
+  </header>
+
+  <section class="summary" id="summary" aria-label="Findings by severity"></section>
+
+  <div class="bar">
+    <div class="tabs" role="group" aria-label="View">
+      <button class="tab" id="tab-check" aria-pressed="true">Check a listing</button>
+      <button class="tab" id="tab-report" aria-pressed="false">Full report</button>
+    </div>
+    <div class="ctrl">
+      <span class="clock" id="clock"></span>
+      <button class="btn" id="advance" title="Move the check time forward 20 minutes">Advance 20 min</button>
+      <button class="btn" id="reset">Reset demo</button>
+    </div>
+  </div>
+
+  <main id="view-check" class="layout">
+    <nav class="list" id="list" aria-label="Listings"></nav>
+    <div class="panel" id="work"></div>
+  </main>
+
+  <section id="view-report" class="panel" hidden></section>
+
+  <details class="panel">
+    <summary>How it works</summary>
+    <ul>
+      <li>The MLS record is the source of truth. Each site is compared to it, field by field.</li>
+      <li>Formats are cleaned first, so "$725,000", "725000", "Lane" and "Ln" are not errors.</li>
+      <li>Status and price rank critical. Address, beds and baths rank high. Square footage is medium. Description text is low.</li>
+      <li>Seller instructions are separate rules: a hidden address must not show, and a listing must not appear on a site the seller did not allow.</li>
+      <li>If the MLS changed in the last 15 minutes, a difference is marked "recheck" because a site may not have caught up.</li>
+      <li>A bad value in the MLS record is flagged and skipped. The rest of the listing is still checked.</li>
+    </ul>
+  </details>
+</div>
+
+<script>
+(function(){
+const SITES=["agent_platform","brand_site","portal_a","portal_b"];
+const SITE_LABEL={agent_platform:"Agent platform",brand_site:"Brand site",portal_a:"Portal A",portal_b:"Portal B",MLS:"MLS",validator:"Validator"};
+const FIELDS=[["status","critical"],["list_price","critical"],["address","high"],["beds","high"],["baths","high"],["sqft","medium"],["remarks","low"]];
+const FIELD_LABEL={status:"Status",list_price:"Price",address:"Address",beds:"Beds",baths:"Baths",sqft:"Sq ft",remarks:"Description",listing:"Listing",syndication:"Allowed sites",record:"Record"};
+const SEV=["critical","high","medium","low","recheck"];
+const SEV_LABEL={critical:"Critical",high:"High",medium:"Medium",low:"Low",recheck:"Recheck"};
+const ACTION={critical:"Fix now and tell the listing agent.",high:"Review today.",medium:"Review this week.",low:"Log it. Fix when convenient.",recheck:"Probably a sync delay. Check again after the sync window."};
+const STATUS_MAP={"active":"active","for sale":"active","new":"active","coming soon":"coming_soon","pending":"pending","under contract":"pending","sale pending":"pending","sold":"sold","closed":"sold","withdrawn":"off","off market":"off","canceled":"off","cancelled":"off"};
+const ABBR={street:"st",avenue:"ave",road:"rd",drive:"dr",lane:"ln",court:"ct",boulevard:"blvd",place:"pl",terrace:"ter"};
+const BASE_CHECK=Date.parse("2026-11-02T14:00:00Z");
+const WINDOW_MIN=15;
+const ALL4=["agent_platform","brand_site","portal_a","portal_b"];
+const t=s=>Date.parse(s);
+
+const SEED_LISTINGS=[
+ {listing_id:"L1001",status:"Active",list_price:725000,address:"14 Maple Ln",beds:4,baths:3,sqft:2400,remarks:"Sunny colonial with updated kitchen and fenced yard.",last_modified:t("2026-11-01T09:00:00Z"),hide_address:false,syndicate_to:ALL4},
+ {listing_id:"L1002",status:"Pending",list_price:512000,address:"88 Harbor Rd",beds:3,baths:2,sqft:1650,remarks:"Walk to the water. Contract signed.",last_modified:t("2026-11-02T12:00:00Z"),hide_address:false,syndicate_to:ALL4},
+ {listing_id:"L1003",status:"Active",list_price:1250000,address:"5 Orchard Ct",beds:5,baths:4,sqft:3900,remarks:"Private lot. Showings by appointment.",last_modified:t("2026-11-01T10:30:00Z"),hide_address:true,syndicate_to:["agent_platform","brand_site","portal_a"]},
+ {listing_id:"L1004",status:"Active",list_price:389000,address:"212 Elm Street",beds:2,baths:1,sqft:1850,remarks:"Bright corner unit near the train. Pets welcome. New roof in 2024.",last_modified:t("2026-11-01T08:15:00Z"),hide_address:false,syndicate_to:ALL4},
+ {listing_id:"L1005",status:"Active",list_price:589000,address:"9 Birch Drive",beds:3,baths:2,sqft:1720,remarks:"Price improvement.",last_modified:t("2026-11-02T13:52:00Z"),hide_address:false,syndicate_to:ALL4},
+ {listing_id:"L1006",status:"Active",list_price:445000,address:"301 Cedar Avenue",beds:3,baths:2,sqft:1500,remarks:"Quiet street.",last_modified:t("2026-11-01T11:00:00Z"),hide_address:false,syndicate_to:["agent_platform","brand_site","portal_a"]},
+ {listing_id:"L1007",status:"Active",list_price:"N/A",address:"77 Pine Ct",beds:null,baths:2,sqft:1300,remarks:"Record with bad inputs.",last_modified:t("2026-11-01T07:00:00Z"),hide_address:false,syndicate_to:["agent_platform","brand_site"]}
+];
+const SEED_DISPLAYS={
+ agent_platform:{
+  L1001:{status:"Active",list_price:"$725,000",address:"14 Maple Ln",beds:4,baths:3,sqft:2400,remarks:"Sunny colonial with updated kitchen and fenced yard."},
+  L1002:{status:"Pending",list_price:"$512,000",address:"88 Harbor Rd",beds:3,baths:2,sqft:1650,remarks:"Walk to the water. Contract signed."},
+  L1003:{status:"Active",list_price:"$1,250,000",address:"Address withheld",beds:5,baths:4,sqft:3900,remarks:"Private lot. Showings by appointment."},
+  L1004:{status:"Active",list_price:"$389,000",address:"212 Elm St",beds:2,baths:1,sqft:1850,remarks:"Bright corner unit near the train. Pets welcome. New roof in 2024."},
+  L1005:{status:"Active",list_price:"$589,000",address:"9 Birch Dr",beds:3,baths:2,sqft:1720,remarks:"Price improvement."},
+  L1006:{status:"Active",list_price:"$445,000",address:"301 Cedar Ave",beds:3,baths:2,sqft:1500,remarks:"Quiet street."},
+  L1007:{status:"Active",list_price:"$310,000",address:"77 Pine Ct",beds:3,baths:2,sqft:1300,remarks:"Record with bad inputs."}},
+ brand_site:{
+  L1001:{status:"Active",list_price:"$725,000",address:"14 Maple Lane",beds:4,baths:3,sqft:2400,remarks:"Sunny colonial with updated kitchen and fenced yard."},
+  L1002:{status:"For Sale",list_price:"$512,000",address:"88 Harbor Rd",beds:3,baths:2,sqft:1650,remarks:"Walk to the water. Contract signed."},
+  L1003:{status:"Active",list_price:"$1,250,000",address:"Address withheld",beds:5,baths:4,sqft:3900,remarks:"Private lot. Showings by appointment."},
+  L1004:{status:"Active",list_price:"$389,000",address:"212 Elm St",beds:2,baths:1,sqft:1850,remarks:"Bright corner unit near the train. Pets welcome..."},
+  L1005:{status:"Active",list_price:"$589,000",address:"9 Birch Dr",beds:3,baths:2,sqft:1720,remarks:"Price improvement."},
+  L1007:{status:"Active",list_price:"$310,000",address:"77 Pine Ct",beds:3,baths:2,sqft:1300,remarks:"Record with bad inputs."}},
+ portal_a:{
+  L1001:{status:"Active",list_price:"725000",address:"14 Maple Ln",beds:4,baths:3,sqft:2400,remarks:"Sunny colonial with updated kitchen and fenced yard."},
+  L1002:{status:"Under Contract",list_price:"$512,000",address:"88 Harbor Rd",beds:3,baths:2,sqft:1650,remarks:"Walk to the water. Contract signed."},
+  L1003:{status:"Active",list_price:"$1,250,000",address:"5 Orchard Ct",beds:5,baths:4,sqft:3900,remarks:"Private lot. Showings by appointment."},
+  L1004:{status:"Active",list_price:"$389,000",address:"212 Elm St",beds:2,baths:1,sqft:1580,remarks:"Bright corner unit near the train. Pets welcome. New roof in 2024."},
+  L1005:{status:"Active",list_price:"$610,000",address:"9 Birch Dr",beds:3,baths:2,sqft:1720,remarks:"Price improvement."},
+  L1006:{status:"Active",list_price:"$445,000",address:"301 Cedar Ave",beds:3,baths:2,sqft:1500,remarks:"Quiet street."}},
+ portal_b:{
+  L1001:{status:"Active",list_price:"$752,000",address:"14 Maple Ln",beds:4,baths:3,sqft:2400,remarks:"Sunny colonial with updated kitchen and fenced yard."},
+  L1002:{status:"Pending",list_price:"$512,000",address:"88 Harbor Rd",beds:3,baths:2,sqft:1650,remarks:"Walk to the water. Contract signed."},
+  L1004:{status:"Active",list_price:"$389,000",address:"212 Elm St",beds:2,baths:1,sqft:1850,remarks:"Bright corner unit near the train. Pets welcome. New roof in 2024."},
+  L1005:{status:"Active",list_price:"$610,000",address:"9 Birch Dr",beds:3,baths:2,sqft:1720,remarks:"Price improvement."},
+  L1006:{status:"Active",list_price:"$445,000",address:"301 Cedar Ave",beds:3,baths:2,sqft:1500,remarks:"Quiet street."}}
+};
+
+let listings, displays, advance, selected="L1001", view="check";
+function resetState(){listings=JSON.parse(JSON.stringify(SEED_LISTINGS));displays=JSON.parse(JSON.stringify(SEED_DISPLAYS));advance=0;}
+resetState();
+
+/* ---------- validation ---------- */
+class Unreadable extends Error{}
+function normPrice(v){
+  if(v==null||typeof v==="boolean")throw new Unreadable("price missing");
+  if(typeof v==="number")return Math.round(v);
+  const s=String(v).trim().toLowerCase().replace(/,/g,"").replace(/\$/g,"");
+  const m=/^(\d+(?:\.\d+)?)([km]?)$/.exec(s);
+  if(!m)throw new Unreadable("price not readable: '"+v+"'");
+  return Math.round(parseFloat(m[1])*({"":1,k:1e3,m:1e6})[m[2]]);
+}
+function normNum(v){
+  if(v==null||typeof v==="boolean")throw new Unreadable("number missing");
+  if(typeof v==="number")return v;
+  const s=String(v).replace(/[^\d.]/g,"");
+  if(!s||isNaN(parseFloat(s)))throw new Unreadable("number not readable: '"+v+"'");
+  return parseFloat(s);
+}
+function normStatus(v){
+  if(v==null)throw new Unreadable("status missing");
+  const k=String(v).trim().toLowerCase().replace(/\s+/g," ");
+  if(!(k in STATUS_MAP))throw new Unreadable("unknown status: '"+v+"'");
+  return STATUS_MAP[k];
+}
+function normAddress(v){
+  if(v==null)throw new Unreadable("address missing");
+  return String(v).toLowerCase().replace(/[^\w\s]/g," ").split(/\s+/).filter(Boolean).map(w=>ABBR[w]||w).join(" ");
+}
+function normText(v){
+  if(v==null)throw new Unreadable("text missing");
+  return String(v).replace(/\s+/g," ").trim();
+}
+const NORM={status:normStatus,list_price:normPrice,address:normAddress,beds:normNum,baths:normNum,sqft:normNum,remarks:normText};
+const q=v=>typeof v==="string"?"'"+v+"'":String(v);
+function fnd(lid,site,field,kind,severity,expected,shown,note){return{listing_id:lid,site,field,kind,severity,expected,shown,note,action:ACTION[severity]};}
+
+function validateListing(mls,disp,checkMs){
+  const lid=mls.listing_id,findings=[],audit=[];
+  const recent=mls.last_modified>=checkMs-WINDOW_MIN*60000;
+  const allowed=new Set(mls.syndicate_to||[]);
+  let mlsStatus=null;try{mlsStatus=normStatus(mls.status);}catch(e){}
+  const src={};
+  for(const [f] of FIELDS){
+    try{src[f]=NORM[f](mls[f]);}
+    catch(e){if(!(e instanceof Unreadable))throw e;
+      findings.push(fnd(lid,"MLS",f,"source_unreadable","high",mls[f],null,"The MLS record itself has a problem: "+e.message+". Not compared."));}
+  }
+  for(const site of SITES){
+    const shown=disp[site][lid];
+    const expectedPresent=["active","pending","coming_soon"].includes(mlsStatus)&&allowed.has(site);
+    if(!shown){
+      if(expectedPresent)findings.push(fnd(lid,site,"listing","missing_listing","high","shown","not shown",SITE_LABEL[site]+" should show this listing but does not."));
+      audit.push({listing_id:lid,site,result:"not_shown",expected_present:expectedPresent});
+      continue;
+    }
+    if(!allowed.has(site))findings.push(fnd(lid,site,"syndication","instruction_violation","critical","not allowed","shown","The seller's instructions do not allow "+SITE_LABEL[site]+" to show this listing."));
+    let checked=0;
+    for(const [field,sev] of FIELDS){
+      if(!(field in src))continue;
+      if(field==="address"&&mls.hide_address){
+        let sa="";try{sa=normAddress(shown.address);}catch(e){}
+        if(sa.includes(src.address))findings.push(fnd(lid,site,"address","instruction_violation","critical","address hidden",shown.address,"The seller asked to hide the address, but it is showing."));
+        checked++;continue;
+      }
+      checked++;
+      let got;
+      try{got=NORM[field](shown[field]);}
+      catch(e){if(!(e instanceof Unreadable))throw e;
+        findings.push(fnd(lid,site,field,"shown_unreadable",sev,mls[field],shown[field],SITE_LABEL[site]+": "+e.message+"."));continue;}
+      const want=src[field];
+      if(got===want)continue;
+      if(field==="remarks"&&shown.remarks&&/(\.\.\.|…)\s*$/.test(String(shown.remarks))){
+        const stem=normText(String(shown.remarks).replace(/[. …]+$/,""));
+        if(want.startsWith(stem)){findings.push(fnd(lid,site,field,"truncated","low",mls[field],shown[field],"Description is cut off."));continue;}
+      }
+      if(recent)findings.push(fnd(lid,site,field,"possible_sync_lag","recheck",mls[field],shown[field],"The MLS changed in the last "+WINDOW_MIN+" minutes, so "+SITE_LABEL[site]+" may not have synced yet."));
+      else findings.push(fnd(lid,site,field,"mismatch",sev,mls[field],shown[field],SITE_LABEL[site]+" shows "+q(shown[field])+"; the MLS has "+q(mls[field])+"."));
+    }
+    audit.push({listing_id:lid,site,result:"checked",fields_checked:checked});
+  }
+  return{findings,audit};
+}
+function compute(){
+  const checkMs=BASE_CHECK+advance*60000;
+  const by={},all=[],audit=[];
+  for(const L of listings){
+    let r;
+    try{r=validateListing(L,displays,checkMs);}
+    catch(e){r={findings:[fnd(L.listing_id,"validator","record","validator_error","high",null,null,"The validator could not process this record: "+e.message)],audit:[{listing_id:L.listing_id,site:"validator",result:"error"}]};}
+    by[L.listing_id]=r;all.push(...r.findings);audit.push(...r.audit);
+  }
+  all.sort((a,b)=>SEV.indexOf(a.severity)-SEV.indexOf(b.severity)||a.listing_id.localeCompare(b.listing_id)||a.site.localeCompare(b.site));
+  for(const id in by)by[id].findings.sort((a,b)=>SEV.indexOf(a.severity)-SEV.indexOf(b.severity));
+  return{checkMs,by,all,audit};
+}
+
+/* ---------- helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money=n=>"$"+Number(n).toLocaleString("en-US");
+const getL=id=>listings.find(l=>l.listing_id===id);
+function mlsDisplay(L,f){
+  const v=L[f];
+  if(v==null||v==="")return "missing";
+  if(f==="list_price"&&typeof v==="number")return money(v);
+  if(f==="address"&&L.hide_address)return v+" (hidden)";
+  return String(v);
+}
+function ideal(L){
+  return{status:L.status,list_price:typeof L.list_price==="number"?money(L.list_price):L.list_price,address:L.hide_address?"Address withheld":L.address,beds:L.beds,baths:L.baths,sqft:L.sqft,remarks:L.remarks};
+}
+function worst(findings){for(const s of SEV)if(findings.some(f=>f.severity===s))return s;return null;}
+const COLOR={critical:"var(--crit)",high:"var(--high)",medium:"var(--med)",low:"var(--low)",recheck:"var(--recheck)"};
+function clockText(ms){return new Date(ms).toISOString().slice(11,16)+" UTC";}
+
+/* ---------- drawing ---------- */
+let RES=compute();
+function drawSummary(){
+  const c={};SEV.forEach(s=>c[s]=RES.all.filter(f=>f.severity===s).length);
+  $("#summary").innerHTML=SEV.map(s=>'<div class="stat s-'+s+'"><span class="n">'+c[s]+'</span><span class="l">'+SEV_LABEL[s]+'</span></div>').join("");
+  $("#clock").textContent="Check time "+clockText(RES.checkMs);
+}
+function drawList(){
+  $("#list").innerHTML=listings.map(L=>{
+    const f=RES.by[L.listing_id].findings,w=worst(f);
+    return '<button class="item" data-id="'+L.listing_id+'" aria-current="'+(L.listing_id===selected)+'" style="'+(w?'--c:'+COLOR[w]:'')+'">'
+      +'<span class="id">'+L.listing_id+'</span><span class="ad">'+esc(L.address)+'</span>'
+      +'<span class="cnt">'+(f.length?f.length+' finding'+(f.length>1?'s':'')+' · worst '+SEV_LABEL[w].toLowerCase():'All clear')+'</span></button>';
+  }).join("");
+}
+function drawWork(){
+  const L=getL(selected);
+  const mins=Math.round((RES.checkMs-L.last_modified)/60000);
+  const chips=SITES.map(s=>'<label class="chip"><input type="checkbox" data-allow="'+s+'"'+(L.syndicate_to.includes(s)?' checked':'')+'> '+SITE_LABEL[s]+'</label>').join("");
+  const head=SITES.map(s=>{
+    const on=!!displays[s][selected];
+    return '<th scope="col"><div class="sitehead"><span>'+SITE_LABEL[s]+'</span><span class="sitebadge" data-badge="'+s+'"></span>'
+      +'<label class="shown"><input type="checkbox" data-shown="'+s+'"'+(on?' checked':'')+'> shown on site</label></div></th>';
+  }).join("");
+  const rows=FIELDS.map(([f])=>'<tr><th scope="row">'+FIELD_LABEL[f]+'</th><td class="src">'+esc(mlsDisplay(L,f))+'</td>'
+    +SITES.map(s=>{
+      const d=displays[s][selected];
+      return '<td><input class="cell" data-site="'+s+'" data-field="'+f+'" aria-label="'+SITE_LABEL[s]+' '+FIELD_LABEL[f]+'" value="'+esc(d&&d[f]!=null?d[f]:"")+'"'+(d?'':' disabled placeholder="not shown"')+'></td>';
+    }).join("")+'</tr>').join("");
+  $("#work").innerHTML=
+   '<div class="mls">'
+   +'<div class="box"><h2>'+esc(L.address)+' <span class="mono" style="color:var(--muted)">'+L.listing_id+'</span></h2><p class="try">The MLS column is the source of truth. Edit any site value to see the check respond.</p></div>'
+   +'<div class="box"><span class="lab">Seller instructions</span><label class="chip" style="align-self:flex-start"><input type="checkbox" data-hide'+(L.hide_address?' checked':'')+'> Hide street address</label></div>'
+   +'<div class="box"><span class="lab">Sites allowed to show it</span><div class="chips">'+chips+'</div></div>'
+   +'<div class="box"><span class="lab">MLS last changed</span><label><input class="num" type="number" min="0" data-mins value="'+mins+'" aria-label="Minutes before the check time that the MLS last changed"> min before check</label></div>'
+   +'</div>'
+   +'<div class="gridwrap"><table class="grid"><thead><tr><th scope="col">Field</th><th scope="col">MLS says</th>'+head+'</tr></thead><tbody>'+rows+'</tbody></table></div>'
+   +'<div><h2 style="margin-bottom:8px">Findings for this listing</h2><div class="finds" id="finds"></div></div>';
+}
+function actionsFor(f){
+  const L=getL(f.listing_id),acts=[];
+  if(f.kind==="mismatch"||f.kind==="shown_unreadable"||f.kind==="truncated"){
+    acts.push({label:"Set to MLS value",run:()=>{const d=displays[f.site][f.listing_id];if(d)d[f.field]=f.field==="list_price"&&typeof L.list_price==="number"?money(L.list_price):L[f.field];}});
+  }else if(f.kind==="instruction_violation"&&f.field==="address"){
+    acts.push({label:"Hide address",run:()=>{displays[f.site][f.listing_id].address="Address withheld";}});
+  }else if(f.kind==="instruction_violation"){
+    acts.push({label:"Remove from site",run:()=>{delete displays[f.site][f.listing_id];}});
+  }else if(f.kind==="missing_listing"){
+    acts.push({label:"Show listing",run:()=>{displays[f.site][f.listing_id]=ideal(L);}});
+  }else if(f.kind==="possible_sync_lag"){
+    acts.push({label:"Advance 20 min",run:()=>{advance+=20;}});
+  }
+  return acts;
+}
+let ACTS=[];
+function drawFinds(){
+  const list=RES.by[selected].findings;
+  ACTS=[];
+  const el=$("#finds");
+  if(!el)return;
+  if(!list.length){el.innerHTML='<div class="good"><span aria-hidden="true">&#10003;</span> No problems found for this listing.</div>';return;}
+  el.innerHTML=list.map(f=>{
+    const a=actionsFor(f);
+    const btns=a.map(x=>{ACTS.push(x);return '<button class="btn" data-act="'+(ACTS.length-1)+'">'+x.label+'</button>';}).join("")
+      ||(f.kind==="source_unreadable"||f.kind==="validator_error"?'<span class="try">Needs a person to correct the MLS record.</span>':'');
+    return '<div class="finding sev-'+f.severity+'"><span class="badge">'+SEV_LABEL[f.severity]+'</span>'
+      +'<div><strong>'+esc(SITE_LABEL[f.site]||f.site)+' · '+esc(FIELD_LABEL[f.field]||f.field)+'</strong><p>'+esc(f.note)+'</p><p class="next">Next step: '+esc(f.action)+'</p></div>'
+      +'<div>'+btns+'</div></div>';
+  }).join("");
+}
+function drawFlags(){
+  const list=RES.by[selected].findings;
+  document.querySelectorAll(".cell").forEach(c=>{
+    c.className="cell";
+    if(c.disabled)return;
+    const m=list.filter(f=>f.site===c.dataset.site&&f.field===c.dataset.field);
+    const w=worst(m);
+    if(w){c.classList.add("f-"+w);c.title=m[0].note;}else{c.classList.add("ok");c.title="Matches the MLS";}
+  });
+  document.querySelectorAll("[data-badge]").forEach(b=>{
+    const m=list.filter(f=>f.site===b.dataset.badge&&(f.field==="listing"||f.field==="syndication"));
+    const w=worst(m);
+    b.textContent=w?(m[0].kind==="missing_listing"?"Missing":"Not allowed"):"";
+    b.style.setProperty("--c",w?COLOR[w]:"inherit");
+  });
+}
+function drawReport(){
+  const rows=RES.all.map(f=>'<tr><td><span class="badge sev-'+f.severity+'">'+SEV_LABEL[f.severity]+'</span></td><td class="mono">'+f.listing_id+'</td><td>'+esc(SITE_LABEL[f.site]||f.site)+'</td><td>'+esc(FIELD_LABEL[f.field]||f.field)+'</td><td>'+esc(f.note)+'</td><td>'+esc(f.action)+'</td></tr>').join("");
+  const log=RES.audit.map(a=>JSON.stringify({checked_at:new Date(RES.checkMs).toISOString(),...a})).join("\n");
+  $("#view-report").innerHTML='<h2>Full report</h2><p class="try">'+listings.length+' listings, '+RES.audit.filter(a=>a.result==="checked").length+' site checks run, '+RES.all.length+' findings.</p>'
+    +'<div class="tablewrap"><table class="rep"><thead><tr><th>Severity</th><th>Listing</th><th>Site</th><th>Field</th><th>What happened</th><th>Next step</th></tr></thead><tbody>'+(rows||'<tr><td colspan="6">No findings.</td></tr>')+'</tbody></table></div>'
+    +'<details><summary>Audit log ('+RES.audit.length+' entries)</summary><pre class="audit">'+esc(log)+'</pre></details>';
+}
+function drawAll(){RES=compute();drawSummary();drawList();drawWork();drawFinds();drawFlags();drawReport();}
+function refresh(){RES=compute();drawSummary();drawList();drawFinds();drawFlags();drawReport();}
+
+/* ---------- events ---------- */
+document.addEventListener("click",e=>{
+  const item=e.target.closest(".item");if(item){selected=item.dataset.id;drawAll();return;}
+  const act=e.target.closest("[data-act]");if(act){ACTS[+act.dataset.act].run();drawAll();return;}
+});
+document.addEventListener("input",e=>{
+  const c=e.target;
+  if(c.classList&&c.classList.contains("cell")){const d=displays[c.dataset.site][selected];if(d){d[c.dataset.field]=c.value;refresh();}}
+});
+document.addEventListener("change",e=>{
+  const c=e.target,L=getL(selected);
+  if(c.dataset.shown){const s=c.dataset.shown;if(c.checked)displays[s][selected]=ideal(L);else delete displays[s][selected];drawAll();}
+  else if(c.dataset.allow){const s=c.dataset.allow;L.syndicate_to=c.checked?[...new Set([...L.syndicate_to,s])]:L.syndicate_to.filter(x=>x!==s);drawAll();}
+  else if("hide" in c.dataset){L.hide_address=c.checked;drawAll();}
+  else if("mins" in c.dataset){const v=Math.max(0,parseFloat(c.value)||0);L.last_modified=RES.checkMs-v*60000;drawAll();}
+});
+$("#advance").addEventListener("click",()=>{advance+=20;drawAll();});
+$("#reset").addEventListener("click",()=>{resetState();selected="L1001";drawAll();});
+function setView(v){
+  view=v;
+  $("#view-check").hidden=v!=="check";$("#view-report").hidden=v!=="report";
+  $("#tab-check").setAttribute("aria-pressed",v==="check");$("#tab-report").setAttribute("aria-pressed",v==="report");
+}
+$("#tab-check").addEventListener("click",()=>setView("check"));
+$("#tab-report").addEventListener("click",()=>setView("report"));
+drawAll();
+})();
+</script>
