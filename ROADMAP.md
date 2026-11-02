@@ -1,10 +1,32 @@
-# Roadmap after v1
+# Roadmap
 
-This is the checklist for taking the workflow from a first working version to one where nearly all routine checks and low-risk fixes run on their own. It is a plan, not built.
+This is the checklist for building a first working version and then taking it to one where nearly all routine checks and low-risk fixes run on their own. It is a plan, not built.
 
 **v1 means:** Connected to real MLS data read-only for one MLS and one or two sites, with the 15-minute run and the nightly sweep, the persistent-mismatch rule, Slack alerts, an audit log, and people fixing problems by hand.
 
 **What nearly autonomous means here.** The aim is that routine checking, explaining and low-risk fixing run without a person, and people spend their time on exceptions and judgment calls. It does not mean no people. Each stage should be earned with measured results before the next starts. The agentic stage (F) is optional and only worth doing if the problem needs open-ended investigation.
+
+## V1. Build the first working version
+
+- [ ] Get written permission from Legal and the MLS for the data you will read, store and show. *Done when: Written approval, and a rule for where the data may live.*
+- [ ] Pick the first MLS, one or two sites and a small set of listings. Agree the success measures with the Director. *Done when: A written scope and success measures.*
+- [ ] Get read-only credentials and keep them in a secrets store, not in code. *Done when: The credentials work and none are in the repo.*
+- [ ] Keep the tests and the demo on made-up data. Real data never goes in the repo or the public logs. *Done when: Checked before each push.*
+- [ ] Build the MLS source adapter (the RESO Web API where the MLS offers it). Map fields and statuses from that MLS's own documentation. *Done when: Real records come back in the shape the validator uses, and the mapping is checked against the documentation.*
+- [ ] Build a site adapter for the first site: its API if it has one, otherwise the public page within its terms and rate limits. *Done when: It returns what the site shows, in the validator's shape.*
+- [ ] Move that MLS's rules into a config file: field mapping, status words, required fields. *Done when: The first MLS runs from config, not code.*
+- [ ] Run read-only on a few listings and check every finding by hand. Fix the rules and count false alarms. *Done when: Findings match what a person sees.*
+- [ ] Run beside the manual process for a few weeks. *Done when: Side-by-side results written down.*
+- [ ] Make an empty or failed feed report 'no data' with one alert. *Done when: Tested with a simulated outage.*
+- [ ] Add memory between runs for the persistent-mismatch rule. *Done when: A difference seen on two runs becomes a finding, and a test proves it.*
+- [ ] Schedule the 15-minute run (changed listings plus open rechecks, critical fields every run, no overlapping runs) and the nightly sweep on an internal scheduler. *Done when: Both run on their own and the logs show it.*
+- [ ] Add Slack alerts: route by severity, one thread per listing, no repeats, a daily summary for medium and low. Keep the webhook in the secrets store. *Done when: A test critical finding shows up in Slack with the right details.*
+- [ ] Add run logging and a health check: run time, listings checked, errors, last successful run. *Done when: Someone is alerted if a run does not happen.*
+- [ ] Keep seller personal details out of logs and reports, set how long logs are kept, and take extra care with hidden-address listings. *Done when: Reviewed by Privacy and Security.*
+- [ ] Name an owner for alerts and an escalation path for a critical alert nobody acknowledges. *Done when: The owner and the escalation time are written down.*
+- [ ] Create a ticket for each high and critical finding and confirm the fix by running the check again. *Done when: Closed means the check passes again.*
+- [ ] Document how it works, how to add an MLS, how to read a finding, and known issues. *Done when: A new teammate can run it.*
+- [ ] Review with the Director and Legal and decide whether to turn it on for real. *Done when: A go or no-go decision on record.*
 
 ## A. Stabilize v1
 

@@ -4,7 +4,7 @@ When a listing moves from the listing agent to the MLS and out to other sites, d
 
 ![The Listing Check demo showing a price mismatch on one portal](docs/screenshot.png)
 
-A checklist for what to do after a first working version is in [ROADMAP.md](ROADMAP.md).
+A checklist for building a first working version, and for what comes after it, is in [ROADMAP.md](ROADMAP.md).
 
 A small prototype that checks whether a listing shows the right information on each site, using the MLS record as the source of truth.
 
