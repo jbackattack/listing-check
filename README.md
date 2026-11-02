@@ -66,15 +66,15 @@ This version has no Slack alert and makes no fixes. The plan:
 
 **Which way fixes go:** the MLS entry made by the listing agent is the source of truth. The tool corrects the site copies to match it. It does not edit the MLS record. If the MLS entry looks wrong, it alerts the listing agent or data owner. Any write access needs Legal and MLS approval first.
 
-## Toward an agentic workflow (idea, not built)
-Today this is a rules-based validation workflow. It is not an agent, because no AI model decides what to do next. These are the steps I would take to grow it into one, in order. Exact fields such as price and status would stay rule-based so the results remain auditable.
+## Where AI fits next (idea, not built)
+Today this is a rules-based validation workflow with no AI model. The goal is to use AI where it adds something and keep rules where rules are enough. Exact fields such as price and status stay rule-based so the results remain auditable. In order:
 
-1. **Add an AI step for the judgment calls.** Compare description text to the MLS remarks and explain a mismatch in plain language. Build a small labeled test set first (pairs with known answers) and measure accuracy before relying on it.
-2. **Let it investigate, read-only.** Give it tools to fetch the MLS record, fetch a site page, and read earlier runs. Before alerting, it gathers evidence: is the difference still there, does it affect other listings or sites, did it start after a particular change. It reports a root-cause guess, for example "Portal B looks like it is serving a cached copy."
-3. **Let it propose actions.** It drafts the alert and the suggested fix and names which tool would apply it. A person approves.
-4. **Give it memory.** Keep past findings and the ones marked "not an issue," so it triages better over time.
-5. **Add guardrails before any write access.** A list of allowed tools, a step limit, a log of every tool call, tests on labeled cases, human approval for any change, and a kill switch.
-6. **Only then allow limited actions,** starting with the low-risk fixes in the roadmap above.
+1. **Generate test scenarios from a requirements doc.** Given a feature spec, list the scenarios and edge cases to cover by brand, market, MLS rule set, listing status and seller instruction. A person reviews the list before it becomes tests.
+2. **Explain and group findings.** Turn a mismatch into a plain-language explanation for support and brand teams, and group similar findings (for example, several listings wrong on one portal after the same change) with a root-cause guess.
+3. **Compare text that rules cannot judge.** Check description text against the MLS remarks. Build a small labeled test set first and measure accuracy before relying on it.
+4. **Draft rules and SOPs.** Draft per-MLS rules and SOP updates from MLS rule documents and change notes, for a person to review.
+5. **Measure and guard every AI step.** Keep a labeled test set, log inputs and outputs, and have a person review exceptions.
+6. **Optional, later: investigate and act.** If a case needs open-ended investigation, add read-only tools so it can gather evidence before alerting, then propose fixes for approval. Add write access only with guardrails (allowed tools, a step limit, logged tool calls, approval, a kill switch). That would make it an agent, and it may not be needed.
 
 ## When it runs (plan, not built)
 
